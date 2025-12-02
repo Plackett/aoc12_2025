@@ -5,9 +5,10 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <iostream>
 #include <string>
+#include <iostream>
 #include "Days/day1.h"
+#include "Days/day2.h"
 
 std::string getInput();
 #endif //MAIN_H

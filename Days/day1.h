@@ -7,19 +7,15 @@
 #include "../utils.h"
 
 inline void handleRotation(int& origin, const std::string &rotation) {
-    int amount = 0;
+    const int amount = std::stoi(rotation.substr(1));
 
-    if (rotation.at(0) == 'L') {
-        amount = -std::stoi(splitString(rotation, "L").at(1));
+    if (rotation.at(0) == 'R') {
+        origin = (origin + amount) % 100;
     } else {
-        amount = std::stoi(splitString(rotation, "R").at(1));
+        origin = (origin - amount) % 100;
+        if (origin < 0) origin += 100;
     }
 
-    origin = (origin + amount) % 100;
-
-    while (origin < 0) { // C++ modulo doesn't even work bruyh
-        origin += 100;
-    }
 }
 
 inline void handleRotationPt2(int& origin, const std::string &rotation, int& password) {
@@ -55,14 +51,14 @@ inline void day1(const std::string& input) {
         handleRotation(origin, line);
         if (origin == 0) password++;
     }
-    std::cout << "The solution to part one is " << password << '\n';
+    std::cout << "Day 1 Part 1: " << password << '\n';
     line = "";
     password = 0;
     origin = 50;
     while (std::getline(partTwo,line)) {
         handleRotationPt2(origin, line,password);
     }
-    std::cout << "The solution to part two is " << password << '\n';
+    std::cout << "Day 1 Part 2: " << password << '\n';
 }
 
 #endif //DAY1_H
