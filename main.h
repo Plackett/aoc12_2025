@@ -12,6 +12,7 @@
 #include "Days/day3.h"
 #include "Days/day4.h"
 #include "Days/day5.h"
+#include "Days/day6.h"
 
 std::string getInput();
 #endif //MAIN_H
