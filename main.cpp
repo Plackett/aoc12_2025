@@ -44,9 +44,9 @@ int main() {
         case '6':
             day6(input);
             break;
-        // case '7':
-        //     day7(input);
-        //     break;
+        case '7':
+            day7(input);
+            break;
         // case '8':
         //     day8(input);
         //     break;
