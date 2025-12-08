@@ -1,0 +1,12 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "aoc2025.exe (build\\x64\\aoc.exe\\aoc2025.exe)",
+      "name": "aoc2025.exe (build\\x64\\aoc.exe\\aoc2025.exe)"
+    }
+  ]
+}

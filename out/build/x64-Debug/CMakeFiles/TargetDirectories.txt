@@ -1,0 +1,3 @@
+C:/Users/jdk23e/source/repos/Plackett/aoc12_2025/out/build/x64-Debug/CMakeFiles/aoc2025.dir
+C:/Users/jdk23e/source/repos/Plackett/aoc12_2025/out/build/x64-Debug/CMakeFiles/edit_cache.dir
+C:/Users/jdk23e/source/repos/Plackett/aoc12_2025/out/build/x64-Debug/CMakeFiles/rebuild_cache.dir

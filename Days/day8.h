@@ -5,6 +5,7 @@
 #ifndef DAY8_H
 #define DAY8_H
 #include "../utils.h"
+#include <functional>
 
 struct Coordinate {
     long long x = 0;
@@ -20,55 +21,109 @@ struct TwoCoordinates {
 };
 
 double get3DDistance(const Coordinate& p1, const Coordinate& p2) {
-    return std::sqrt(std::pow(p2.x-p1.x,2)+std::pow(p2.y-p1.y,2)+std::pow(p2.z-p2.z,2));
+    return std::sqrt(std::pow(p2.x-p1.x,2)+std::pow(p2.y-p1.y,2)+std::pow(p2.z-p1.z,2));
 }
 
 long long calcThreeLargestCircuits(std::vector<Coordinate> junctionBoxes) {
-    for(int i = 0; i < junctionBoxes.size(); ++i) {
+    /*for(int i = 0; i < junctionBoxes.size(); ++i) {
         junctionBoxes.at(i).circuit = i;
     }
     int numConnections = 0;
-    while(numConnections < 10) {
+    while(numConnections < 999) {
         TwoCoordinates shortestDistance = {INT_MAX,-1,-1};
         for(int i = 0; i < junctionBoxes.size(); ++i) {
             for(int j = junctionBoxes.size()-1; j >= 0; j--) {
-                if(i != j && get3DDistance(junctionBoxes.at(i),junctionBoxes.at(j)) < shortestDistance.first) {
+                if(i != j && get3DDistance(junctionBoxes.at(i),junctionBoxes.at(j)) < shortestDistance.distance && junctionBoxes.at(i).circuit != junctionBoxes.at(j).circuit) {
                     shortestDistance.distance = get3DDistance(junctionBoxes.at(i),junctionBoxes.at(j));
                     shortestDistance.first = i;
                     shortestDistance.second = j;
                 }
             }
         }
-        for(int i = 0; i < junctionBoxes.size(); ++i) {
-            if(junctionBoxes.at(i).circuit == junctionBoxes.at(shortestDistance.second).circuit) junctionBoxes.at(i).circuit = junctionBoxes.at(shortestDistance.first).circuit;
+        int oldCircuit = int(junctionBoxes.at(shortestDistance.second).circuit);
+        int newCircuit = int(junctionBoxes.at(shortestDistance.first).circuit);
+        if (oldCircuit != newCircuit) {
+            for (int i = 0; i < junctionBoxes.size(); ++i) {
+                if (junctionBoxes.at(i).circuit == oldCircuit) {
+                    junctionBoxes.at(i).circuit = newCircuit;
+                }
+            }
+            numConnections++;
+        
         }
-        numConnections++;
     }
-    std::pair<int,int> LargestCircuit = std::pair{0,1};
+    std::pair<int,int> LargestCircuit = std::pair{0,0};
     for(int i = 0; i < junctionBoxes.size(); ++i) {
         int currentSize = 0;
         for(int j = 0; j < junctionBoxes.size(); ++j) {
-            if(junctionBoxes.at(j).circuit == i) currentSize++;
+            if (junctionBoxes.at(j).circuit == i) {
+                currentSize++;
+            }
         }
         if(currentSize > LargestCircuit.second) LargestCircuit = std::pair{i,currentSize};
     }
-    std::pair<int,int> SecondLargest = std::pair{0,1};
+    std::pair<int,int> SecondLargest = std::pair{0,0};
     for(int i = 0; i < junctionBoxes.size(); ++i) {
         int currentSize = 0;
         for(int j = 0; j < junctionBoxes.size(); ++j) {
             if(junctionBoxes.at(j).circuit == i) currentSize++;
         }
-        if(currentSize > SecondLargest.second && currentSize != LargestCircuit.second ) SecondLargest = std::pair{i,currentSize};
+        if(currentSize > SecondLargest.second && i != LargestCircuit.first ) SecondLargest = std::pair{i,currentSize};
     }
-    std::pair<int,int> ThirdLargest = std::pair{0,1};
+    std::pair<int,int> ThirdLargest = std::pair{0,0};
     for(int i = 0; i < junctionBoxes.size(); ++i) {
         int currentSize = 0;
         for(int j = 0; j < junctionBoxes.size(); ++j) {
             if(junctionBoxes.at(j).circuit == i) currentSize++;
         }
-        if(currentSize > ThirdLargest.second && currentSize != LargestCircuit.second ) ThirdLargest = std::pair{i,currentSize};
+        if(currentSize > ThirdLargest.second && i != LargestCircuit.first && i != SecondLargest.first) ThirdLargest = std::pair{i,currentSize};
     }
-    return LargestCircuit.second * SecondLargest.second * ThirdLargest.second;
+    return LargestCircuit.second * SecondLargest.second * ThirdLargest.second;*/
+
+    long long n = junctionBoxes.size();
+
+    std::vector<int> parent(n);
+    for (int i = 0; i < n; ++i) parent[i] = i;
+
+    std::function<int(int)> find = [&](int x) {
+        if (parent[x] != x) parent[x] = find(parent[x]);
+        return parent[x];
+        };
+
+    std::vector<std::tuple<double,int,int>> distances;
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            double dist = get3DDistance(junctionBoxes[i], junctionBoxes[j]);
+            distances.push_back({ dist, i, j });
+        }
+    }
+
+    std::sort(distances.begin(), distances.end());
+
+    int numConnections = 0;
+    for (auto [dist, i, j] : distances) {
+        int pi = find(i);
+        int pj = find(j);
+
+        if (pi != pj) {
+            parent[pi] = pj;
+            numConnections++;
+            if (numConnections == 999) break;
+        }
+    }
+
+    std::map<int, int> circuitSizes;
+    for (int i = 0; i < n; ++i) {
+        circuitSizes[find(i)]++;
+    }
+
+    std::vector<int> sizes;
+    for (auto [id, size] : circuitSizes) {
+        sizes.push_back(size);
+    }
+    std::sort(sizes.rbegin(), sizes.rend());
+
+    return (long long)sizes[0] * sizes[1] * sizes[2];
 }
 
 void day8(const std::string& input) {
