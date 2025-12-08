@@ -47,9 +47,9 @@ int main() {
         case '7':
             day7(input);
             break;
-        // case '8':
-        //     day8(input);
-        //     break;
+        case '8':
+            day8(input);
+            break;
         // case '9':
         //     day9(input);
         //     break;
@@ -69,8 +69,8 @@ int main() {
             day4(input);
             day5(input);
             day6(input);
-            // day7(input);
-            // day8(input);
+            day7(input);
+            day8(input);
             // day9(input);
             // day10(input);
             // day11(input);

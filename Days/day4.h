@@ -16,7 +16,7 @@ long long findAcessibleRolls(std::vector<std::pair<int,int>> rolls) {
         for (int j = -1; j <= 1; ++j) {
             for (int k = -1; k <= 1; ++k) {
                 if (k == 0 && j == 0) continue;
-                if (std::find(rolls.begin(),rolls.end(),std::pair{rolls.at(i).first+j,rolls.at(i).second+k}) != rolls.end()) numNeighbors++;
+                if (std::find(rolls.begin(),rolls.end(), std::pair<int,int>(rolls.at(i).first+j,rolls.at(i).second+k)) != rolls.end()) numNeighbors++;
             }
         }
         if (numNeighbors < 4) accessible++;
@@ -31,7 +31,7 @@ std::vector<std::pair<int,int>> findAcessibleRollsPt2(std::vector<std::pair<int,
         for (int j = -1; j <= 1; ++j) {
             for (int k = -1; k <= 1; ++k) {
                 if (k == 0 && j == 0) continue;
-                if (std::find(rolls.begin(),rolls.end(),std::pair{rolls.at(i).first+j,rolls.at(i).second+k}) != rolls.end()) numNeighbors++;
+                if (std::find(rolls.begin(),rolls.end(),std::pair<int,int>(rolls.at(i).first+j,rolls.at(i).second+k)) != rolls.end()) numNeighbors++;
             }
         }
         if (numNeighbors < 4) {
