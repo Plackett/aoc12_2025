@@ -20,11 +20,11 @@ struct TwoCoordinates {
     int second;
 };
 
-double get3DDistance(const Coordinate& p1, const Coordinate& p2) {
+inline double get3DDistance(const Coordinate& p1, const Coordinate& p2) {
     return std::sqrt(std::pow(p2.x-p1.x,2)+std::pow(p2.y-p1.y,2)+std::pow(p2.z-p1.z,2));
 }
 
-long long calcThreeLargestCircuits(std::vector<Coordinate> junctionBoxes) {
+inline long long calcThreeLargestCircuits(const std::vector<Coordinate> &junctionBoxes) {
     /*for(int i = 0; i < junctionBoxes.size(); ++i) {
         junctionBoxes.at(i).circuit = i;
     }
@@ -80,35 +80,38 @@ long long calcThreeLargestCircuits(std::vector<Coordinate> junctionBoxes) {
     }
     return LargestCircuit.second * SecondLargest.second * ThirdLargest.second;*/
 
-    long long n = junctionBoxes.size();
+    const long long n = junctionBoxes.size();
 
     std::vector<int> parent(n);
     for (int i = 0; i < n; ++i) parent[i] = i;
 
     std::function<int(int)> find = [&](int x) {
+        // weird lambda function to ensure we don't form a cycle yet
         if (parent[x] != x) parent[x] = find(parent[x]);
         return parent[x];
-        };
+    };
 
     std::vector<std::tuple<double,int,int>> distances;
+    distances.reserve(n * (n - 1) / 2);
     for (int i = 0; i < n; ++i) {
         for (int j = i + 1; j < n; ++j) {
             double dist = get3DDistance(junctionBoxes[i], junctionBoxes[j]);
-            distances.push_back({ dist, i, j });
+            distances.emplace_back(dist, i, j);
         }
     }
 
     std::sort(distances.begin(), distances.end());
 
-    int numConnections = 0;
-    for (auto [dist, i, j] : distances) {
-        int pi = find(i);
-        int pj = find(j);
+    int limit = 1000;
+    if (distances.size() < limit) limit = distances.size();
+
+    for (int k = 0; k < limit; ++k) {
+        auto [dist, i, j] = distances[k];
+        const int pi = find(i);
+        const int pj = find(j);
 
         if (pi != pj) {
             parent[pi] = pj;
-            numConnections++;
-            if (numConnections == 999) break;
         }
     }
 
@@ -118,15 +121,62 @@ long long calcThreeLargestCircuits(std::vector<Coordinate> junctionBoxes) {
     }
 
     std::vector<int> sizes;
+    sizes.reserve(circuitSizes.size());
     for (auto [id, size] : circuitSizes) {
         sizes.push_back(size);
     }
     std::sort(sizes.rbegin(), sizes.rend());
 
-    return (long long)sizes[0] * sizes[1] * sizes[2];
+    if (sizes.size() < 3) {
+        return 0;
+    }
+
+    return static_cast<long long>(sizes[0]) * sizes[1] * sizes[2];
 }
 
-void day8(const std::string& input) {
+inline long long calcLargestCircuit(const std::vector<Coordinate>& junctionBoxes) {
+    const long long n = junctionBoxes.size();
+
+    std::vector<int> parent(n);
+    for (int i = 0; i < n; ++i) parent[i] = i;
+
+    std::function<int(int)> find = [&](const int x) {
+        // weird lambda function to ensure we don't form a cycle yet
+        if (parent[x] != x) parent[x] = find(parent[x]);
+        return parent[x];
+    };
+
+    std::vector<std::tuple<double, int, int>> distances;
+    distances.reserve(n * (n - 1) / 2);
+    for (int i = 0; i < n; ++i) {
+        for (int j = i + 1; j < n; ++j) {
+            double dist = get3DDistance(junctionBoxes[i], junctionBoxes[j]);
+            distances.emplace_back(dist, i, j);
+        }
+    }
+
+    std::sort(distances.begin(), distances.end());
+    int merges = 0;
+
+    for (auto [dist, first, second] : distances) {
+        // every node starts by having itself as a parent
+        const int parentOfFirst = find(first);
+        const int parentOfSecond = find(second);
+
+        if (parentOfFirst != parentOfSecond) {
+            parent[parentOfFirst] = parentOfSecond;
+            merges++;
+
+            if (merges == n - 1) {
+                return junctionBoxes[first].x * junctionBoxes[second].x;
+            }
+        }
+    }
+
+    return 0;
+}
+
+inline void day8(const std::string& input) {
     std::istringstream file(input);
     std::string line;
     std::vector<Coordinate> junctionBoxes{};
@@ -136,8 +186,10 @@ void day8(const std::string& input) {
         junctionBoxes.emplace_back(Coordinate{std::stoll(formattedLine.at(0)),std::stoll(formattedLine.at(1)),std::stoll(formattedLine.at(2))});
     }
 
-    long long dayone = calcThreeLargestCircuits(junctionBoxes);
+    const long long dayone = calcThreeLargestCircuits(junctionBoxes);
     std::cout << "Day 8 Part 1: " << dayone << "\n";
+    const long long daytwo = calcLargestCircuit(junctionBoxes);
+    std::cout << "Day 8 Part 2: " << daytwo << "\n";
 }
 
 #endif
