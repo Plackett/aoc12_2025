@@ -3,6 +3,8 @@
 //
 
 #include "main.h"
+#include <iostream>
+#include <string>
 
 std::string getInput() {
     std::string input;
@@ -21,47 +23,58 @@ std::string getInput() {
 }
 
 int main() {
-    const std::string input = getInput();
+    std::string input = getInput();
+
     std::cout << "Enter the number (1-12) for the day to run or type * for all days\n";
-    char day;
-    std::cin >> day;
-    switch(day) {
-        case '1':
+    std::string dayStr;
+    std::getline(std::cin, dayStr);
+
+    int dayNum = -1;
+    if (dayStr != "*") {
+        try {
+            dayNum = std::stoi(dayStr);
+        } catch (...) {
+            dayNum = -1;
+        }
+    }
+
+    switch (dayNum) {
+        case 1:
             day1(input);
             break;
-        case '2':
+        case 2:
             day2(input);
             break;
-        case '3':
+        case 3:
             day3(input);
             break;
-        case '4':
+        case 4:
             day4(input);
             break;
-        case '5':
+        case 5:
             day5(input);
             break;
-        case '6':
+        case 6:
             day6(input);
             break;
-        case '7':
+        case 7:
             day7(input);
             break;
-        case '8':
+        case 8:
             day8(input);
             break;
-        case '9':
+        case 9:
             day9(input);
             break;
-        // case '10':
-        //     day10(input);
-        //     break;
-        // case '11':
-        //     day11(input);
-        //     break;
-        // case '12':
-        //     day12(input);
-        //     break;
+        case 10:
+            day10(input);
+            break;
+        case 11:
+            // day11(input);
+            break;
+        case 12:
+            // day12(input);
+            break;
         default:
             day1(input);
             day2(input);
@@ -72,7 +85,7 @@ int main() {
             day7(input);
             day8(input);
             day9(input);
-            // day10(input);
+            day10(input);
             // day11(input);
             // day12(input);
             break;
