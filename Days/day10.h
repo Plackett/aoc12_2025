@@ -101,11 +101,78 @@ inline long long ButtonJoltBFS(const std::vector<int>& targetState, const std::v
     return -1;
 }
 
+// im not going to lie I googled how to solve a linear system in C++ and got this
+inline long long solveLinearSystem(const std::vector<int>& target, const std::vector<std::vector<int>>& buttons) {
+    const int rows = target.size();
+    const int cols = buttons.size();
+    std::vector matrix(rows, std::vector(cols + 1, 0.0));
+
+    // Fill the matrix (buttons are columns, target is the last column)
+    for (int j = 0; j < cols; ++j) {
+        for (int i : buttons[j]) {
+            if (i < rows) matrix[i][j] = 1.0;
+        }
+    }
+    for (int i = 0; i < rows; ++i) {
+        matrix[i][cols] = target[i];
+    }
+
+    // Forward Elimination
+    int pivotRow = 0;
+    for (int col = 0; col < cols && pivotRow < rows; ++col) {
+        int maxRow = pivotRow;
+        for (int i = pivotRow + 1; i < rows; ++i) {
+            if (std::abs(matrix[i][col]) > std::abs(matrix[maxRow][col])) {
+                maxRow = i;
+            }
+        }
+
+        if (std::abs(matrix[maxRow][col]) < 0.000001) continue;
+
+        std::swap(matrix[pivotRow], matrix[maxRow]);
+
+        for (int i = pivotRow + 1; i < rows; ++i) {
+            double factor = matrix[i][col] / matrix[pivotRow][col];
+            for (int k = col; k <= cols; ++k) {
+                matrix[i][k] -= factor * matrix[pivotRow][k];
+            }
+        }
+        pivotRow++;
+    }
+
+    std::vector solution(cols, 0.0);
+    for (int i = pivotRow - 1; i >= 0; --i) {
+        int pivotCol = -1;
+        for (int j = 0; j < cols; ++j) {
+            if (std::abs(matrix[i][j]) > 0.000001) {
+                pivotCol = j;
+                break;
+            }
+        }
+
+        if (pivotCol == -1) continue;
+
+        double sum = matrix[i][cols];
+        for (int j = pivotCol + 1; j < cols; ++j) {
+            sum -= matrix[i][j] * solution[j];
+        }
+        solution[pivotCol] = sum / matrix[i][pivotCol];
+    }
+
+    long long total = 0;
+    for (double s : solution) {
+        long long presses = std::llround(s);
+        if (presses < 0) return -1;
+        total += presses;
+    }
+    return total;
+}
+
 inline long long calcMinButtonsJoltage(const std::vector<std::vector<int>>& joltage, const std::vector<std::vector<std::vector<int>>> & buttons) {
     long long totalButtonPresses = 0;
 
     for (size_t i = 0; i < joltage.size(); ++i) {
-        long long steps = ButtonJoltBFS(joltage.at(i), buttons.at(i));
+        long long steps = solveLinearSystem(joltage.at(i), buttons.at(i));
 
         if (steps == -1) {
             std::cerr << "help im dying\n";

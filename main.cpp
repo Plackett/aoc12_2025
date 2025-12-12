@@ -70,7 +70,7 @@ int main() {
             day10(input);
             break;
         case 11:
-            // day11(input);
+            day11(input);
             break;
         case 12:
             // day12(input);
@@ -86,7 +86,7 @@ int main() {
             day8(input);
             day9(input);
             day10(input);
-            // day11(input);
+            day11(input);
             // day12(input);
             break;
     }
